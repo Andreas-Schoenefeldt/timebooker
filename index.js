@@ -35,12 +35,6 @@ const report = require("./src/report");
             console.log('Existing report processed!');
             break;
         case 'new':
-
-            const files = await fs.promises.readdir(dataFolder);
-            files.forEach(file => {
-                fs.unlinkSync(path.join(dataFolder, file));
-            });
-
             answers = await inquirer.prompt([
                 {
                     name: 'sequence',
@@ -65,13 +59,18 @@ const report = require("./src/report");
 
             // @todo - put some validations and credebility checks (to later then from e.g.)
 
+            // clear the stage
+            const files = await fs.promises.readdir(dataFolder);
+            files.forEach(file => {
+                fs.unlinkSync(path.join(dataFolder, file));
+            });
+
             console.log('Downloading');
 
             needle.get('https://time.emphasize.de/util/report.php?export=csv&type=' + answers.sequence + '&token=6148lk4g4gk8c0c8wgo0&from=' + answers.from + '&to=' + answers.to + '&Submit=Show', {
                 open_timeout: 30000
             }).pipe(fs.createWriteStream(reportsPath))
                 .on('done', async function(err) {
-
                     await processReport(reportsPath);
 
 

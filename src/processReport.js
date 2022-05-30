@@ -1,3 +1,4 @@
+const { DateTime } = require("luxon");
 const fs = require("fs");
 const csv = require("fast-csv");
 const math = require("mathjs");
@@ -58,7 +59,8 @@ module.exports = function (reportsPath) {
                         if (!entriesByCustomers[customer]) {
                             entriesByCustomers[customer] = {
                                 result: [],
-                                perDay: {}
+                                perDay: {},
+                                perWeek: {},
                             }
                         }
 
@@ -137,6 +139,47 @@ module.exports = function (reportsPath) {
                             entriesByCustomers[customer].perDay[entry.date].reported += t.time;
                         })
 
+                        // per week calculations
+                        const dt = DateTime.fromISO(entry.date);
+                        const weekNumber = dt.weekNumber;
+                        const weekDay = dt.weekday;
+
+                        const weekKey = weekNumber + ' - ' + entry.activity;
+
+                        if (!entriesByCustomers[customer].perWeek[weekKey]) {
+                            entriesByCustomers[customer].perWeek[weekKey] = {
+                                week: `${weekNumber} (${entry.date})`,
+                                activity: entry.activity,
+                                '1': 0,
+                                '2': 0,
+                                '3': 0,
+                                '4': 0,
+                                '5': 0,
+                                '6': 0,
+                                '7': 0,
+                                tickets: [],
+                                comments: [],
+                            }
+                        }
+
+                        const weekConf = entriesByCustomers[customer].perWeek[weekKey];
+
+                        ticketNumbers.forEach((ticket) => {
+                            if (weekConf.tickets.indexOf(ticket) < 0) {
+                                weekConf.tickets.push(ticket);
+                                weekConf.tickets.sort();
+                            }
+
+                            tickets[ticket].comments.forEach((comment) => {
+                                if (weekConf.comments.indexOf(comment) < 0) {
+                                    weekConf.comments.push(comment);
+                                    weekConf.comments.sort();
+                                }
+                            })
+                        });
+
+                        weekConf[weekDay] += entry.time;
+
                         callback(null, true);
                     } else {
                         inquirer.prompt([
@@ -170,6 +213,7 @@ module.exports = function (reportsPath) {
                 Object.keys(entriesByCustomers).forEach((customer) => {
                     csv.writeToPath('./data/' + customer +'_times.csv', entriesByCustomers[customer].result, {headers: true});
                     csv.writeToPath('./data/' + customer +'_perDay.csv', Object.values(entriesByCustomers[customer].perDay), {headers: true});
+                    csv.writeToPath('./data/' + customer +'_perWeek.csv', Object.values(entriesByCustomers[customer].perWeek), {headers: true});
                 });
 
             })

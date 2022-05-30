@@ -22,6 +22,7 @@
     "cheerio": "^1.0.0-rc.10",
     "fast-csv": "^4.3.6",
     "inquirer": "^8.2.0",
+    "luxon": "^2.4.0",
     "mathjs": "^10.0.2",
     "needle": "^3.0.0"
   }
