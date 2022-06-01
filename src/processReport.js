@@ -25,7 +25,6 @@ module.exports = function (reportsPath) {
                 if (minutes > 1) {
 
                     const dayParts =  row.Day.split('.');
-                    const time = math.ceil( minutes/ 15) * 15 / 60;
 
                     const info = row.Info.split("\n").map((line) => {
                         return line.substr(6);
@@ -34,7 +33,6 @@ module.exports = function (reportsPath) {
                     entries.push({
                         activity,
                         minutes,
-                        time,
                         info,
                         date: `${dayParts[2]}-${dayParts[1]}-${dayParts[0]}`
                     })
@@ -63,6 +61,14 @@ module.exports = function (reportsPath) {
                                 perWeek: {},
                             }
                         }
+
+                        // calculate the rounded time
+                        const unit = byCustomer[customer].granularity || 0.25;
+
+                        console.log(customer, unit);
+
+                        const granularityMinutes = unit * 60;
+                        entry.time = math.ceil( entry.minutes / granularityMinutes) * granularityMinutes / 60;
 
                         entry.info.forEach( (comment) => {
                             let ticket;
@@ -102,7 +108,6 @@ module.exports = function (reportsPath) {
                             tickets[ticket].comments.push(comment || 'development & bugfixing');
                         })
 
-                        const unit = 0.25;
                         const ticketNumbers = Object.keys(tickets);
                         let available = entry.time / unit - ticketNumbers.length;
                         let usedWeights = 0;

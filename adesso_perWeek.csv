@@ -1,0 +1,8 @@
+1,2,3,4,5,6,7,week,activity,tickets,comments
+0,0,0,0,0,0,0.5,17 (2022-05-01),Adesso: BRD PM,PM,Booking Times
+0.75,2.25,5,4,1.75,0,0,18 (2022-05-02),Adesso: BRD Multibrand,"ECOM-21101,ECOM-21493","Analysis,Clarification,Clarification with Adyen,Cleanup,Clenup and BB Styles,EL adjsutments,Existing card works as well,General functionallity available,Linked the fields,RV adjsutments,Start of co-brand implementation,Syncing with adyen translations,Translations are haded over to adyen,Upgraded the adyen javascript"
+0.75,0.5,0.75,2.25,3,0,0,18 (2022-05-02),Adesso: BRD PM,"ECOM-21101,ECOM-21202,PM","Brd Addesso Weekly,Cleanup,Migration Planning,Status Call Aldo,Team Call Halil,Team Calls,Used the management API to automatically geenrate allowedOrigins and clientKeys,clientKey is generated via the management api now,development & bugfixing"
+3.5,1.25,0.75,3.25,1.25,0,0,19 (2022-05-09),Adesso: BRD Multibrand,"ECOM-21101,ECOM-21141,ECOM-21143,ECOM-21325,ECOM-21505,ECOM-21562,ECOM-21588","Analysis,Analysis and contact with Adyen support,Clarification,Contact with Adyen,Fixed the auth,Restored Credit Card for my Account,cleanup"
+1.5,0.5,1,0,0,0,0,19 (2022-05-09),Adesso: BRD PM,PM,"Team Call Hans,Weekly,development & bugfixing"
+1.75,0	,0,2.5,0,0,0,20 (2022-05-16),Adesso: BRD Multibrand,"ECOM-21101,ECOM-21143,ECOM-21562","Aligned the price calculations with the pdp,Analysis,BB Finetune,EL adjustments,Error hardening of the callbacks,Fixed Billabong UI,RV UI adjustments,package.json adjustments"
+0	,0,0.25,0,0.75,0,0,21 (2022-05-25),Adesso: BRD PM,PM,"Handover Hans,development & bugfixing"
