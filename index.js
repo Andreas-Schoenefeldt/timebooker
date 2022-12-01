@@ -71,6 +71,7 @@ const report = require("./src/report");
                 open_timeout: 30000
             }).pipe(fs.createWriteStream(reportsPath))
                 .on('done', async function(err) {
+
                     await processReport(reportsPath);
 
 

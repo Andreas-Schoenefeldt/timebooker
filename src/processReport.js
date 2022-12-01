@@ -20,6 +20,9 @@ module.exports = function (reportsPath) {
 
                 const regex = /=TIME\((\d+);(\d+);(\d+)\)/gm;
                 const m = regex.exec(row.Total);
+                if (!m) {
+                    throw new Error('Can not parse time from: ' + row.Total);
+                }
                 const minutes = parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
 
                 if (minutes > 1) {
@@ -64,8 +67,6 @@ module.exports = function (reportsPath) {
 
                         // calculate the rounded time
                         const unit = byCustomer[customer].granularity || 0.25;
-
-                        console.log(customer, unit);
 
                         const granularityMinutes = unit * 60;
                         entry.time = math.ceil( entry.minutes / granularityMinutes) * granularityMinutes / 60;
@@ -211,17 +212,21 @@ module.exports = function (reportsPath) {
                 }
             }
 
-            async.series(entries.map((entry) => {
-                return processLine.bind(this, entry);
-            }), function () {
+            if (entries.length === 0) {
+                throw new Error('The report does not contain any lines.');
+            } else {
+                async.series(entries.map((entry) => {
+                    return processLine.bind(this, entry);
+                }), function () {
 
-                Object.keys(entriesByCustomers).forEach((customer) => {
-                    csv.writeToPath('./data/' + customer +'_times.csv', entriesByCustomers[customer].result, {headers: true});
-                    csv.writeToPath('./data/' + customer +'_perDay.csv', Object.values(entriesByCustomers[customer].perDay), {headers: true});
-                    csv.writeToPath('./data/' + customer +'_perWeek.csv', Object.values(entriesByCustomers[customer].perWeek), {headers: true});
-                });
+                    Object.keys(entriesByCustomers).forEach((customer) => {
+                        csv.writeToPath('./data/' + customer +'_times.csv', entriesByCustomers[customer].result, {headers: true});
+                        csv.writeToPath('./data/' + customer +'_perDay.csv', Object.values(entriesByCustomers[customer].perDay), {headers: true});
+                        csv.writeToPath('./data/' + customer +'_perWeek.csv', Object.values(entriesByCustomers[customer].perWeek), {headers: true});
+                    });
 
-            })
+                })
+            }
         })
 
 
