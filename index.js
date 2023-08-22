@@ -6,6 +6,7 @@ const reportsPath = dataFolder + 'report.csv';
 const inquirer = require("inquirer");;
 const processReport = require("./src/processReport");
 const report = require("./src/report");
+const comments = require("./src/comments");
 
 (async function run () {
     let answers = await inquirer.prompt([
@@ -20,8 +21,9 @@ const report = require("./src/report");
             ]
         }
     ]);
+    let data = null;
 
-    console.log(answers.action);
+    console.log()
 
     switch (answers.action) {
         default:
@@ -31,7 +33,7 @@ const report = require("./src/report");
             console.log('Reported %o', success);
             break;
         case 'rerun':
-            await processReport(reportsPath);
+            data = await processReport(reportsPath);
             console.log('Existing report processed!');
             break;
         case 'new':
@@ -72,7 +74,7 @@ const report = require("./src/report");
             }).pipe(fs.createWriteStream(reportsPath))
                 .on('done', async function(err) {
 
-                    await processReport(reportsPath);
+                    data = await processReport(reportsPath);
 
 
                     console.log('New report downloaded & processed!');
@@ -80,6 +82,11 @@ const report = require("./src/report");
 
             break;
     }
+
+    console.log("");
+    console.log(await comments({
+        answers, data
+    }));
 
 })();
 
