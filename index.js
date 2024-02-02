@@ -1,8 +1,5 @@
-const needle = require('needle');
-const fs = require("fs");
-const path = require("path");
 const dataFolder = './data/';
-const reportsPath = dataFolder + 'report.csv';
+const reportsPath = dataFolder + 'report.json';
 const inquirer = require("inquirer");;
 const processReport = require("./src/processReport");
 const report = require("./src/report");
@@ -15,7 +12,6 @@ const comments = require("./src/comments");
             type: 'list',
             message: 'Please choose an action',
             choices: [
-                {name: 'New Report', value: 'new'},
                 {name: 'Rerun Existing', value: 'rerun'},
                 {name: 'Report to external Systems', value: 'report'},
             ]
@@ -35,51 +31,6 @@ const comments = require("./src/comments");
         case 'rerun':
             data = await processReport(reportsPath);
             console.log('Existing report processed!');
-            break;
-        case 'new':
-            answers = await inquirer.prompt([
-                {
-                    name: 'sequence',
-                    type: 'list',
-                    message: 'Please choose the sequence of the new report',
-                    choices: [
-                        {name: 'Daily', value: 'daily'},
-                        {name: 'Monthly', value: 'monthly'}
-                    ]
-                },
-                {
-                    name: 'from',
-                    type: 'input',
-                    message: 'Start time in yyyy-mm-dd format'
-                },
-                {
-                    name: 'to',
-                    type: 'input',
-                    message: 'End time in yyyy-mm-dd format'
-                }
-            ]);
-
-            // @todo - put some validations and credebility checks (to later then from e.g.)
-
-            // clear the stage
-            const files = await fs.promises.readdir(dataFolder);
-            files.forEach(file => {
-                fs.unlinkSync(path.join(dataFolder, file));
-            });
-
-            console.log('Downloading');
-
-            needle.get('https://time.emphasize.de/util/report.php?export=csv&type=' + answers.sequence + '&token=6148lk4g4gk8c0c8wgo0&from=' + answers.from + '&to=' + answers.to + '&Submit=Show', {
-                open_timeout: 30000
-            }).pipe(fs.createWriteStream(reportsPath))
-                .on('done', async function(err) {
-
-                    data = await processReport(reportsPath);
-
-
-                    console.log('New report downloaded & processed!');
-                });
-
             break;
     }
 
