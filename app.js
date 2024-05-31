@@ -7,7 +7,7 @@ const app = http.createServer((req, res) => {
     // Set a response type of plain text for the response
 
     const headers = {
-        'Content-Type': 'text/plain',
+        'Content-Type': 'text/html; charset=utf-8',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'POST, GET, OPTIONS'
     }
@@ -73,7 +73,7 @@ const app = http.createServer((req, res) => {
         });
     }
 
-    res.end(req.method + ' - Thank you, the rest then locally.');
+    res.end(req.method + ' - Thank you, the rest then locally. <h1><a href="https://time2.emphasize.de">Back to the reporting!</a></h1>');
 });
 
 // Start the server on port 10801
