@@ -73,7 +73,7 @@ const app = http.createServer((req, res) => {
         });
     }
 
-    res.end(req.method);
+    res.end(req.method + ' - Thank you, the rest then locally.');
 });
 
 // Start the server on port 10801
