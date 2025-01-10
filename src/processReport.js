@@ -43,6 +43,16 @@ module.exports = async function (reportsPath) {
                     const granularityMinutes = unit * 60;
                     entry.time = math.ceil(entry.minutes / granularityMinutes) * granularityMinutes / 60;
 
+                    if (!entry.info.length) {
+                        console.error('WARNING, no Comment for', entry, 'customer: ' + customer);
+
+                        if (!activityConf.defaultTicket) {
+                            throw new Error('Could not handle empty response');
+                        } else {
+                            entry.info.push(activityConf.defaultTicket);
+                        }
+                    }
+
                     for (let comment of entry.info) {
                         let ticket;
 

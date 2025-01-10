@@ -1,4 +1,5 @@
 const http = require('http');
+const {join} = require("node:path");
 
 const ALLOWED_ORIGINS = ['https://time2.emphasize.de'];
 
@@ -9,14 +10,15 @@ const app = http.createServer((req, res) => {
     const headers = {
         'Content-Type': 'text/html; charset=utf-8',
         'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, GET, OPTIONS'
+        'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+        'Location': 'https://time2.emphasize.de'
     }
 
     if (ALLOWED_ORIGINS.indexOf(req.headers.origin) > -1) {
         headers['Access-Control-Allow-Origin'] = req.headers.origin;
     }
 
-    res.writeHead(200, headers);
+    res.writeHead(302, headers);
 
     if (req.method === 'POST') {
 
@@ -60,7 +62,14 @@ const app = http.createServer((req, res) => {
                 }
             });
 
-            const reportsPath =  './data/report.json';
+
+
+            const dataDir = './data/';
+            const reportsPath =  dataDir + 'report.json';
+
+            for (const file of await fs.promises.readdir(dataDir)) {
+                await fs.promises.unlink(join(dataDir, file));
+            }
 
             await fs.promises.writeFile(reportsPath, JSON.stringify(clean, null, 2));
 
@@ -73,7 +82,7 @@ const app = http.createServer((req, res) => {
         });
     }
 
-    res.end(req.method + ' - Thank you, the rest then locally. <h1><a href="https://time2.emphasize.de">Back to the reporting!</a></h1>');
+    res.end(`<html><head><meta http-equiv="refresh" content="0; url=https://time2.emphasize.de" /></head><body>${req.method} - Thank you, the rest then locally. <h1><a href="https://time2.emphasize.de">Back to the reporting!</a></h1></body></html>`);
 });
 
 // Start the server on port 10801

@@ -25,9 +25,10 @@ async function report(customer) {
 module.exports = async function(customerOrAll = 'all') {
 
     if (customerOrAll === 'all') {
-        await async.series(Object.keys(byCustomer).map((customer) => {
-            return report(customer);
-        }));
+
+        for (let customer of Object.keys(byCustomer)) {
+            await report(customer);
+        }
     } else {
         await report(customerOrAll);
     }
