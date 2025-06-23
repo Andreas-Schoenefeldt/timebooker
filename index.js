@@ -12,7 +12,8 @@ const comments = require("./src/comments");
             type: 'list',
             message: 'Please choose an action',
             choices: [
-                {name: 'Rerun Existing', value: 'rerun'},
+                {name: 'Rerun Existing (json)', value: 'rerun'},
+                {name: 'Rerun Existing (csv)', value: 'rerun_csv'},
                 {name: 'Report to external Systems', value: 'report'},
             ]
         }
@@ -48,6 +49,22 @@ const comments = require("./src/comments");
         case 'rerun':
             data = await processReport(reportsPath);
             console.log('Existing report processed!');
+            break;
+        case 'rerun_csv':
+            const fs = require('fs');
+            const csvFiles = fs.readdirSync('./data/').filter(file => file.endsWith('.csv') && file.indexOf('time-emphasize_report') > -1);
+            
+            const csvAnswer = await inquirer.prompt([
+                {
+                    name: 'csvFile',
+                    type: 'list',
+                    message: 'Select a CSV file to process:',
+                    choices: csvFiles.map(file => ({ name: file, value: './data/' + file }))
+                }
+            ]);
+            
+            data = await processReport(csvAnswer.csvFile);
+            console.log('CSV report processed!');
             break;
     }
 
