@@ -1,6 +1,6 @@
 const dataFolder = './data/';
 const reportsPath = dataFolder + 'report.json';
-const inquirer = require("inquirer");;
+const inquirer = require("inquirer");
 const processReport = require("./src/processReport");
 const report = require("./src/report");
 const comments = require("./src/comments");
@@ -12,6 +12,7 @@ const comments = require("./src/comments");
             type: 'list',
             message: 'Please choose an action',
             choices: [
+                {name: 'Prepare a new report', value: 'prepare'},
                 {name: 'Rerun Existing (json)', value: 'rerun'},
                 {name: 'Rerun Existing (csv)', value: 'rerun_csv'},
                 {name: 'Report to external Systems', value: 'report'},
@@ -19,12 +20,21 @@ const comments = require("./src/comments");
         }
     ]);
     let data = null;
+    let success = false;
 
     console.log()
 
     switch (answers.action) {
         default:
             throw new Error('Unknown action ' + answers.action);
+        case 'prepare':
+            console.log('Preparing a worktime report');
+
+            success = await require('./src/prepare')();
+
+            console.log('Done: %o', success ? 'OK' : 'ERROR');
+
+            break;
         case 'report':
             const byCustomer = require('./config/byCustomer');
 
@@ -43,7 +53,7 @@ const comments = require("./src/comments");
                 }
             ]);
 
-            const success = await report(answers.customersOrAll);
+            success = await report(answers.customersOrAll);
             console.log('Reported %o %o',answers.customersOrAll, success);
             break;
         case 'rerun':
