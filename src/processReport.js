@@ -106,7 +106,7 @@ const processLine = async function (entry) {
                         {
                             name: 'ticket',
                             type: 'input',
-                            message: `What is the ticket number for the comment "${comment}"? (Customer ${customer})`,
+                            message: `What is the ticket number (without #) for the comment "${comment}"? (Customer ${customer})`,
                         }
                     ]);
 
