@@ -1,0 +1,37 @@
+meta {
+  name: List Tasks
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{HOST}}/{{ACCOUNT}}/timesheet/my-tasks
+  body: none
+  auth: inherit
+}
+
+body:json {
+  {
+    "ts": {
+      "project_id": "259846",
+      "task_id": "7370733",
+      "task_group_id": "0",
+      "hours": "1:00",
+      "log_date": "2025-11-17",
+      "log_date_formatted": "17.11.2025",
+      "notes": "Analysis and Config adjustment, enabled visibility_by_role as a default visibility option",
+      "id": null,
+      "project_schedule_id": null,
+      "is_locked_by_date": 0,
+      "clock_days": 0,
+      "user_id": 293475,
+      "start_time": "2025-11-21 09:00:00"
+    },
+    "id": null
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
