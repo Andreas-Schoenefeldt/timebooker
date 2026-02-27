@@ -1,0 +1,6 @@
+name: Flowconcept
+variables:
+  - name: HOST
+    value: https://redmine.flowconcept.de
+  - secret: true
+    name: API-KEY

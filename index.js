@@ -16,6 +16,7 @@ const comments = require("./src/comments");
                 {name: 'Rerun Existing (json)', value: 'rerun'},
                 {name: 'Rerun Existing (csv)', value: 'rerun_csv'},
                 {name: 'Report to external Systems', value: 'report'},
+                {name: 'Generate Invoices', value: 'invoices'}
             ]
         }
     ]);
@@ -55,6 +56,9 @@ const comments = require("./src/comments");
 
             success = await report(answers.customersOrAll);
             console.log('Reported %o %o',answers.customersOrAll, success);
+            break;
+        case 'invoices':
+            success = await require('./src/invoices')();
             break;
         case 'rerun':
             data = await processReport(reportsPath);

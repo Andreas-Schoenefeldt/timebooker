@@ -3,7 +3,6 @@ const fs = require("fs");
 const csv = require("fast-csv");
 const math = require("mathjs");
 const inquirer = require("inquirer");
-const async = require("async");
 const activities = require("./../config/activities.json");
 const byCustomer = require("./../config/byCustomer");
 
