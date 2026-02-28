@@ -28,6 +28,6 @@
     "mathjs": "^10.0.2",
     "needle": "^3.0.0",
     "puppeteer": "^24.37.5",
-    "xlsx": "^0.18.5"
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   }
 }
