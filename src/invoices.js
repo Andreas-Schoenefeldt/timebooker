@@ -24,7 +24,12 @@ export default async function() {
         return amount.toFixed(2).replace('.', ',') + ' €';
     });
 
-    const applicableCustomers = Object.keys(byCustomer).filter(customer => typeof byCustomer[customer].invoiceData === 'function');
+    const { start, end } = await inquireDate();
+
+    // get the report
+    const entriesByCustomers = await prepareReport(start, end);
+
+    const applicableCustomers = Object.keys(byCustomer).filter(customer => entriesByCustomers[customer] && typeof byCustomer[customer].invoiceData === 'function');
     const answers = await inquirer.prompt([
         {
             name: 'customersOrAll',
@@ -38,11 +43,6 @@ export default async function() {
             )
         }
     ]);
-
-    const { start, end } = await inquireDate();
-
-    // get the report
-    const entriesByCustomers = await prepareReport(start, end);
 
     let customers = answers.customersOrAll === 'all' ? applicableCustomers : [answers.customersOrAll];
 

@@ -55,6 +55,7 @@ const processLine = async function (entry) {
 
             if (!entriesByCustomers[customer]) {
                 entriesByCustomers[customer] = {
+                    customer: customer,
                     result: [],
                     perDay: {},
                     perWeek: {},
