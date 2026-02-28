@@ -1,8 +1,8 @@
-const byCustomer = require('../config/byCustomer');
-const async = require("async");
+import byCustomer from "./../config/byCustomer.js";
+import async from "async";
 
 
-module.exports = async function (conf) {
+export default async function (conf) {
 
     let comment = '';
 

@@ -1,7 +1,5 @@
-const fs = require("fs");
-const byCustomer = require('../config/byCustomer');
-const csv = require("fast-csv");
-const needle = require("needle");
+import byCustomer from "./../config/byCustomer.js";
+import * as fs from "node:fs";
 
 async function report(customer) {
     const customerConf = byCustomer[customer];
@@ -11,9 +9,7 @@ async function report(customer) {
         const file = `./data/${customer}_times.csv`;
 
         if (fs.existsSync(file)) {
-            await customerConf.report(`./data/${customer}_times.csv`, {
-                csv, needle, fs
-            });
+            await customerConf.report(`./data/${customer}_times.csv`);
             console.log('All times for %o booked', customer);
         } else {
             console.log('No times available for %o', customer);
@@ -25,7 +21,7 @@ async function report(customer) {
     return true;
 }
 
-module.exports = async function(customerOrAll = 'all') {
+export default async function(customerOrAll = 'all') {
 
     if (customerOrAll === 'all') {
 

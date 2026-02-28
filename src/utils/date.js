@@ -1,12 +1,12 @@
-const {DateTime} = require("luxon");
-const {prompt} = require("inquirer");
+import inquirer from "inquirer";
+import {DateTime} from "luxon";
 
 /**
  *
  * @returns {Promise<{start: DateTime, end: DateTime}>}
  */
-exports.inquireDate = async function () {
-    const answers = await prompt([
+export async function inquireDate () {
+    const answers = await inquirer.prompt([
         {
             name: 'period',
             type: 'list',

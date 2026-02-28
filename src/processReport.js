@@ -1,10 +1,10 @@
-const { DateTime } = require("luxon");
-const fs = require("fs");
-const csv = require("fast-csv");
-const math = require("mathjs");
-const inquirer = require("inquirer");
-const activities = require("./../config/activities.json");
-const byCustomer = require("./../config/byCustomer");
+import byCustomer from "./../config/byCustomer.js";
+import activities from "./../config/activities.json" with {type: "json"};
+import inquirer from "inquirer";
+import * as fs from "node:fs";
+import csv from "fast-csv";
+import * as math from "mathjs";
+import {DateTime} from "luxon";
 
 const ignoreMap = {};
 const entriesByCustomers = {};
@@ -227,7 +227,7 @@ const processLine = async function (entry) {
     }
 }
 
-module.exports = async function (reportsPath) {
+export default async function (reportsPath) {
 
 
     if (fs.existsSync(reportsPath)) {

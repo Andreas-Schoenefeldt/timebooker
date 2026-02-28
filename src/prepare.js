@@ -1,11 +1,12 @@
-const { DateTime } = require("luxon");
-const needle = require("needle");
-const fs = require("fs");
-const processReport = require("./processReport");
-const {join} = require("node:path");
-const {inquireDate} = require("./utils/date");
+import {inquireDate} from "./utils/date.js";
+import needle from "needle";
+import {DateTime} from "luxon";
+import * as fs from "node:fs";
+import processReport from "./processReport.js";
+import {join} from "node:path";
 
-module.exports = async function() {
+
+export default async function() {
 
     const { start, end } = await inquireDate();
 

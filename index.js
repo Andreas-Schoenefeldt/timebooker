@@ -1,9 +1,17 @@
+import processReport from './src/processReport.js';
+import report from './src/report.js';
+import comments from './src/comments.js';
+import inquirer from "inquirer";
+import byCustomer from "./config/byCustomer.js";
+import invoices from "./src/invoices.js";
+import * as fs from "node:fs";
+import {promisify} from "node:util";
+import {exec} from "child_process";
+
 const dataFolder = './data/';
 const reportsPath = dataFolder + 'report.json';
-const inquirer = require("inquirer");
-const processReport = require("./src/processReport");
-const report = require("./src/report");
-const comments = require("./src/comments");
+
+const execAsync = promisify(exec); // For async/await
 
 (async function run () {
     let answers = await inquirer.prompt([
@@ -31,14 +39,12 @@ const comments = require("./src/comments");
         case 'prepare':
             console.log('Preparing a worktime report');
 
-            success = await require('./src/prepare')();
+            success = await require('./src/prepare').default();
 
             console.log('Done: %o', success ? 'OK' : 'ERROR');
 
             break;
         case 'report':
-            const byCustomer = require('./config/byCustomer');
-
             answers = await inquirer.prompt([
                 {
                     name: 'customersOrAll',
@@ -58,14 +64,13 @@ const comments = require("./src/comments");
             console.log('Reported %o %o',answers.customersOrAll, success);
             break;
         case 'invoices':
-            success = await require('./src/invoices')();
+            success = invoices();
             break;
         case 'rerun':
             data = await processReport(reportsPath);
             console.log('Existing report processed!');
             break;
         case 'rerun_csv':
-            const fs = require('fs');
             const csvFiles = fs.readdirSync('./data/').filter(file => file.endsWith('.csv') && file.indexOf('time-emphasize_report') > -1);
             
             const csvAnswer = await inquirer.prompt([
@@ -89,4 +94,5 @@ const comments = require("./src/comments");
 
 })();
 
-return;
+// backup of the config directory, as there is so much work in the data functions
+execAsync('cp -a -p ./config ' + byCustomer.config.backupFolder).then(/* silent */).catch(e => console.error(e));
