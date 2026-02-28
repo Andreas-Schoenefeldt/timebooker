@@ -4,6 +4,7 @@ import comments from './src/comments.js';
 import inquirer from "inquirer";
 import byCustomer from "./config/byCustomer.js";
 import invoices from "./src/invoices.js";
+import prepare from "./src/prepare.js";
 import * as fs from "node:fs";
 import {promisify} from "node:util";
 import {exec} from "child_process";
@@ -39,7 +40,7 @@ const execAsync = promisify(exec); // For async/await
         case 'prepare':
             console.log('Preparing a worktime report');
 
-            success = await require('./src/prepare').default();
+            success = await prepare();
 
             console.log('Done: %o', success ? 'OK' : 'ERROR');
 

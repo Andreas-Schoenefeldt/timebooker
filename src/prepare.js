@@ -1,17 +1,18 @@
 import {inquireDate} from "./utils/date.js";
+import source from '../config/source.json' with {type: "json"};
 import needle from "needle";
 import {DateTime} from "luxon";
 import * as fs from "node:fs";
 import processReport from "./processReport.js";
 import {join} from "node:path";
 
-
-export default async function() {
-
-    const { start, end } = await inquireDate();
-
-    const source = require('../config/source.json');
-
+/**
+ *
+ * @param start
+ * @param end
+ * @returns {Promise<Record<string,{perWeek: Record<string, *>, perDay: Record<string,*>,perActivity: Record<string, {}>, totals: {hours: number, comments: string[], activities: string[]}, result: *[]}>>}
+ */
+export async function prepareReport(start, end) {
     const url = source.host + '/report.php?group=day&quantisize=1&includeInfos=true&includeColors=false&topic=' + source.access + '&from=' + start.toMillis() + '&to=' + end.toMillis();
     console.log('Fetching data from ' + url);
 
@@ -51,8 +52,16 @@ export default async function() {
 
     await fs.promises.writeFile(reportsPath, JSON.stringify(clean, null, 2));
 
-    await processReport(reportsPath);
+    const entriesByCustomers = await processReport(reportsPath);
 
     console.log('Report processed and written.');
-    return true;
+    return entriesByCustomers;
+}
+
+
+export default async function() {
+
+    const { start, end } = await inquireDate();
+
+    return await prepareReport(start, end);
 }

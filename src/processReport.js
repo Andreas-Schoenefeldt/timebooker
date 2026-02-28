@@ -58,11 +58,25 @@ const processLine = async function (entry) {
                     result: [],
                     perDay: {},
                     perWeek: {},
+                    perActivity: {},
+                    totals: {
+                        hours: 0,
+                        activities: [],
+                        comments: []
+                    }
+                }
+            }
+
+            if (!entriesByCustomers[customer].perActivity[entry.activity]) {
+                entriesByCustomers[customer].perActivity[entry.activity] = {
+                    activity: entry.activity,
+                    hours: 0,
+                    comments: []
                 }
             }
 
             // calculate the rounded time
-            const unit = byCustomer[customer].granularity || 0.25;
+            const unit = byCustomer[customer]?.granularity || 0.25;
 
             const granularityMinutes = unit * 60;
             entry.time = math.ceil(entry.minutes / granularityMinutes) * granularityMinutes / 60;
@@ -149,14 +163,25 @@ const processLine = async function (entry) {
 
                 t.time = unit + distributedAmount * unit;
 
-                entriesByCustomers[customer].result.push({
+                const processedEntry = {
                     activity: entry.activity,
                     ticket: ticketNumber,
                     date: entry.date,
                     time: t.time,
                     comment: t.comments.join(', '),
                     processed: 0
-                })
+                };
+
+                entriesByCustomers[customer].totals.hours += processedEntry.time;
+                entriesByCustomers[customer].totals.comments.push(processedEntry.comment);
+                if (!entriesByCustomers[customer].totals.activities.includes(processedEntry.activity)) {
+                    entriesByCustomers[customer].totals.activities.push(processedEntry.activity);
+                }
+
+                entriesByCustomers[customer].perActivity[processedEntry.activity].hours += processedEntry.time;
+                entriesByCustomers[customer].perActivity[processedEntry.activity].comments.push(processedEntry.comment);
+
+                entriesByCustomers[customer].result.push(processedEntry)
 
                 entriesByCustomers[customer].perDay[entry.date].reported += t.time;
             })
@@ -227,8 +252,12 @@ const processLine = async function (entry) {
     }
 }
 
+/**
+ *
+ * @param reportsPath
+ * @returns {Promise<Record<string,{perWeek: Record<string, *>, perDay: Record<string,*>, result: *}>>}
+ */
 export default async function (reportsPath) {
-
 
     if (fs.existsSync(reportsPath)) {
         

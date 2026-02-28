@@ -6,6 +6,8 @@ import { join } from "node:path";
 import { readFileSync } from "node:fs";
 import puppeteer from "puppeteer";
 import handlebars from "handlebars";
+import fs from "fs";
+import {prepareReport} from "./prepare.js";
 
 
 export default async function() {
@@ -39,6 +41,9 @@ export default async function() {
 
     const { start, end } = await inquireDate();
 
+    // get the report
+    const entriesByCustomers = await prepareReport(start, end);
+
     let customers = answers.customersOrAll === 'all' ? applicableCustomers : [answers.customersOrAll];
 
     // Read and compile the Handlebars template from the 'templates' directory
@@ -57,16 +62,30 @@ export default async function() {
         /** @type {InvoiceData[]} */
         const invoiceDataArray = await byCustomer[customer].invoiceData(start, end, {
             dataDir: join(import.meta.dirname, '../data'),
+            entries: entriesByCustomers[customer],
         });
 
         for (let invoiceData of invoiceDataArray) {
 
+            let comparison = entriesByCustomers[customer].totals;
+            if (invoiceData.activity !== 'all') {
+                comparison = entriesByCustomers[customer].perActivity[invoiceData.activity];
+            }
+
             console.table(invoiceData.lines);
             console.table([
+                ['hours invoiced:', invoiceData.hoursTotal.toFixed(2)],
+                ['hours tracked:', comparison.hours.toFixed(2)],
                 ['Netto:', invoiceData.netTotal.toFixed(2)],
                 ['Ust.:', invoiceData.tax.toFixed(2)],
                 ['Gesamt.:', invoiceData.total.toFixed(2)],
             ]);
+
+            console.log('');
+
+            if (comparison.hours > invoiceData.hoursTotal) {
+                console.error(`🚨  only invoicing ${invoiceData.hoursTotal}/${comparison.hours} hours for ${invoiceData.activity} (${(invoiceData.hoursTotal / comparison.hours * 100).toFixed(1)}%)`);
+            }
 
             console.log('');
 
@@ -78,7 +97,8 @@ export default async function() {
             await page.setContent(html, { waitUntil: 'networkidle0' });
 
             // Create a PDF from the HTML content and save it with a timestamped filename
-            const pdfPath =  join(import.meta.dirname, '../data', invoiceData.invoiceNumber + '.pdf');
+            const pdfName = invoiceData.invoiceNumber + '.pdf';
+            const pdfPath =  join(import.meta.dirname, '../data', pdfName);
             await page.pdf({
                 path: pdfPath,
                 format: 'A4',
@@ -103,7 +123,10 @@ export default async function() {
                 await merger.save(pdfPath);
             }
 
-            console.log(`PDF successfully created at: ${pdfPath}`);
+            console.log(`✓ PDF successfully created at: ${pdfPath}`);
+            const copyTarget = byCustomer.config.invoiceLocation + '/' + (byCustomer[customer].folderName || customer) + '/' + pdfName;
+            await fs.promises.copyFile(pdfPath, copyTarget);
+            console.log(`✓ PDF copied to ${copyTarget}`);
         }
     }
 
