@@ -14,8 +14,10 @@ async function report(customer) {
         } else {
             console.log('No times available for %o', customer);
         }
+        console.log('------------------------------------------------------------');
     } else {
-        console.log('No report function defined for %o', customer);
+        // silent ignore
+        // console.log('No report function defined for %o', customer);
     }
 
     return true;
@@ -24,7 +26,6 @@ async function report(customer) {
 export default async function(customerOrAll = 'all') {
 
     if (customerOrAll === 'all') {
-
         for (let customer of Object.keys(byCustomer)) {
             await report(customer);
         }

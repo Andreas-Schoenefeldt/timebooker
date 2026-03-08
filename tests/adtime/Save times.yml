@@ -1,0 +1,38 @@
+info:
+  name: Save times
+  type: http
+  seq: 4
+
+http:
+  method: PUT
+  url: "{{HOST}}/eew-backend/api/employees/{{ADTIME_USER_ID}}/timerecords"
+  headers:
+    - name: x-csrf-token
+      value: "{{ADTIME-CSRF-TOKEN}}"
+  body:
+    type: json
+    data: |-
+      {
+          "timeRecords": [
+              {
+                  "projectId": "PROJ007009",
+                  "timeRecordGroupId": "92c2c198-912e-108a-ab09-58a332ac613e",
+                  "featureId": "PROJ007009.1.5-0002",
+                  "timeRecordBillingType": "KV",
+                  "timeRecordDate": "2026-03-02",
+                  "timeRecordDescription": "test",
+                  "timeRecordLocation": {
+                      "locationId": "DE010436",
+                      "locationName": "Unna"
+                  },
+                  "timeRecordHours": "1.00"
+              }
+          ]
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

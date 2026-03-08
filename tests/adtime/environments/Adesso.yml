@@ -1,0 +1,6 @@
+name: Adesso
+variables:
+  - name: HOST
+    value: https://eew.cfapps.eu10.hana.ondemand.com
+  - secret: true
+    name: ADTIME-LOGIN-COOKIE

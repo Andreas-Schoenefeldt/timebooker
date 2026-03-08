@@ -39,7 +39,7 @@ export default async function() {
             choices: [
                 {name: '- ALL -', value: 'all'}
             ].concat(
-                applicableCustomers.map(customer => ({name: customer, value: customer}))
+                applicableCustomers.sort().map(customer => ({name: customer, value: customer}))
             )
         }
     ]);

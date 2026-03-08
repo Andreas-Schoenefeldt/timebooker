@@ -1,0 +1,27 @@
+info:
+  name: Fetch CSRF Token
+  type: http
+  seq: 3
+
+http:
+  method: HEAD
+  url: "{{HOST}}"
+  headers:
+    - name: x-csrf-token
+      value: Fetch
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test('has csrf token ' + res.headers['x-csrf-token'], () => {
+          expect(res.headers['x-csrf-token']).to.be.a('string').with.length.greaterThan(10);
+          bru.setVar('ADTIME-CSRF-TOKEN', res.headers['x-csrf-token']);
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
