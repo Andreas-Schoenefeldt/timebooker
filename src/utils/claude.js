@@ -11,7 +11,7 @@ export async function summarizeGermanText(text, API_KEY) {
             max_tokens: 1024,
             messages: [{
                 role: "user",
-                content: `Fasse diesen deutschen Text in maximal 10 Wörtern zusammen: "${text}"`
+                content: `Fasse diesen Text in maximal 15 Wörtern für eine Rechnung zusammen. Einfach nur den Text, ohne Wortzähler oder fancy Formatierungen: "${text}"`
             }]
         })
     });

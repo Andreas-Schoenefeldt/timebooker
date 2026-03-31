@@ -74,6 +74,7 @@ export default async function() {
 
             console.table(invoiceData.lines);
             console.table([
+                ['invoice number:', invoiceData.invoiceNumber],
                 ['hours invoiced:', invoiceData.hoursTotal.toFixed(2)],
                 ['hours tracked:', comparison.hours.toFixed(2)],
                 ['Netto:', invoiceData.netTotal.toFixed(2)],

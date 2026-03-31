@@ -70,7 +70,7 @@ export class AdTimeClient {
 
         console.log(url.toString());
 
-        await needle('get', url.toString(), Object.assign({}, options, {
+        await needle('get', url.toString(), Object.assign({}, this.httpOptions, {
             output: outputFile
         }));
 
