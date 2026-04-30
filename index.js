@@ -1,6 +1,5 @@
 import processReport from './src/processReport.js';
 import report from './src/report.js';
-import comments from './src/comments.js';
 import inquirer from "inquirer";
 import byCustomer from "./config/byCustomer.js";
 import invoices from "./src/invoices.js";

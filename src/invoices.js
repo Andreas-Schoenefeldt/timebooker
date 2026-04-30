@@ -27,6 +27,7 @@ export default async function() {
     const { start, end } = await inquireDate();
 
     // get the report
+    console.log('Preparing a fresh report for invoices, this might take a while...');
     const entriesByCustomers = await prepareReport(start, end);
 
     const applicableCustomers = Object.keys(byCustomer).filter(customer => entriesByCustomers[customer] && typeof byCustomer[customer].invoiceData === 'function');
