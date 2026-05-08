@@ -99,7 +99,7 @@ export default async function() {
             await page.setContent(html, { waitUntil: 'networkidle0' });
 
             // Create a PDF from the HTML content and save it with a timestamped filename
-            const pdfName = invoiceData.invoiceNumber + '.pdf';
+            const pdfName = (invoiceData.invoiceFileName || invoiceData.invoiceNumber) + '.pdf';
             const pdfPath =  join(import.meta.dirname, '../data', pdfName);
             await page.pdf({
                 path: pdfPath,
