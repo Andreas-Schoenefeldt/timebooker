@@ -1,0 +1,27 @@
+info:
+  name: Create Time Entry
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{HOST}}/api/v1/activities"
+  body:
+    type: json
+    data: |-
+      {
+        "date": "2026-06-10",
+        "description": "Test",
+        "project_id": 947219244,
+        "task_id": 25880168,
+        "seconds": 3600,
+        "remote_id": "108",
+        "remote_url": "https://redmine.flowconcept.de/issues/108"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

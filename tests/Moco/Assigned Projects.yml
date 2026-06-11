@@ -1,0 +1,76 @@
+info:
+  name: Assigned Projects
+  type: graphql
+  seq: 15
+
+graphql:
+  method: POST
+  url: "{{HOST}}/graphql"
+  headers:
+    - name: Origin
+      value: "{{HOST}}"
+    - name: x-csrf-token
+      value: 0h1nbVYBByzci1UkBSq747XkX-VM1m5s93toz28QW6SWpyx6IdzF8yqe4tTqidkGAHavX3mk6WxdkOkoLQcz7Q
+  body:
+    query: |-
+      query QueryGetProjectsAssigned($id: ID, $term: String, $page: Int) @authorize(any: time_tracking) @noOtp {
+        projectsAssigned(
+          id: $id
+          term: $term
+          page: $page
+          active: true
+          contractActive: true
+          tasksActive: true
+        ) {
+          collection {
+            id
+            name
+            identifier
+            isIntern
+            isPreferredForTimeTracking
+            isBillable
+            company {
+              id
+              name
+              __typename
+            }
+            leader {
+              id
+              firstname
+              name
+              fullName
+              initials
+              color
+              avatar {
+                id
+                thumbUrl
+                __typename
+              }
+              __typename
+            }
+            __typename
+          }
+          metadata {
+            currentPage
+            totalPages
+            __typename
+          }
+          __typename
+        }
+      }
+    variables: |-
+      {
+        "term": "",
+        "page": 1
+      }
+  auth:
+    type: apikey
+    key: Cookie
+    value: intercom-device-id-g8qlhxez=5f39f496-5dee-4f6a-8d50-c5f200e7f5b9; remember=8zFuKAVj%2FMMkFEbtXNB2%2BLz%2B%2FtMsPSfzTRU1Jxfach%2Fob6fg0PGaWGzQJjy6K2HalqixrG9gvZyjWg%2FzEPhXNRnr3Okan9qJdao09nyW0tnwiAYOfLX%2FbWFfCC%2FPcMqa8sXJ5%2BpWe4jyyfJlVnkrnmNd6wcilNpU%2BcdOQWWx3J5MMcoFrtLzKfQeUIic3h3q38AV0KxM%2Bj83Ge%2F21AwLI9gvowPHTUtsiSjqueqZloxtAXmCL6AtSoumMg4SZ5dt0KobAytfjr3AgzFB0JYpmtoQu3rW1X8ZV6M2EJXEJ0s9fpc9%2B1bzSp61j%2Foc5WPse8I%2FeJox--igWqD7qBRGFA1Zoj--EL4uxwNIvGThs5oI0w6ihA%3D%3D; _moco_session_time=1781188854; server_id=web01; _mocoapp_web_session=1jZQOozmIjC7y1NSPE%2B5Q9puUxEbcyhl9ox%2Fyka6i6IYcpfSi7gUVxdMFT1XhcgowrKwH%2B7XH1mNTOXz%2BUIFIFQe3U4Rij2bkCwfkFn5T6Ot7Wfeqf7q6ptl%2F0zbXdU94dov6mtK2l5f%2F61%2BF7hOWCu7RoknJ0mVmAEWhSgmd0tv4CaF35Rs9EFI%2FMzBQ0emeQCaKm%2FumTZVJBMTGXheIW5a2WS4gRrEKnXyuxoLVwrG%2FS664j70qZeb0seZV5bPsB32VkKQyuT8EUs0E8X4uK%2FjZz8XaUr%2B%2BWYeNwHfsVNnGn29amMiR3EHx%2B8fd64LuoQ0EOcsAhrZJnvtN8LNEBjTS8K1z1%2FFoxJsXwv0Wfky8YraODWVpDpUF8cH549fge12pFq2zCa9NQu06Lviaark%2FgRzB1jw1iBDH5ZY0EgRrR7WIXk9KHf8ttMBeDHCL%2F2%2BzBjFFay734j9BVl8%2B3YJpPLfAhMh3gWT%2FNsnITmyurvZO67d5czsrwKxqNkeLnkhig%3D%3D--Ir01jfi9hwt1GNuv--ZVhMhpv1hnpDTV1RX16ISg%3D%3D; intercom-session-g8qlhxez=cnJoeE5aTnRFZTd0dTBnRmlGb1pDVUMvOEdoa25KU0U2Zk13M0JkcVJvTGM4UDVGa2d1N2prYVlvWTNHRHlpN2xLKy9RZnZFdzNkMFJtS3R3SHJhZVREQkNvUytZbVhYUlN4S0dnczI2RFVZZ0ltNWNNamgxRWNxRnRHUi9qcUNyVW41R29ZRU40cWsybFhqNUdnNGZubkN1TG9RQzh0d3lpRStkZFFTVHBkZWNCSDdKSFYzVFpoWnNaYVRNQituQ0ZjRUI4WWcxRVlQYkhUYmF1SkM0V1VBWHJ0bXM1NUFHTlo2Tm5iZDBHKzlLaGlTREVwaDNNUEpIUno1L3lQajVwcE9tOFozN1ZodFFFaTMxbFQyR0E9PS0tMWUzUk14Y2VZeUpYdC9oWmxJZ3hoZz09--bd93efe6f0e1d8e36678ffae5b03cbf7681fd7d8
+    placement: header
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

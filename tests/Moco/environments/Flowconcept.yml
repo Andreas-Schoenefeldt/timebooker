@@ -1,0 +1,6 @@
+name: Flowconcept
+variables:
+  - name: HOST
+    value: https://flowconcept.mocoapp.com
+  - secret: true
+    name: API_KEY

@@ -13,7 +13,7 @@ import {join} from "node:path";
  * @returns {Promise<Record<string,{perWeek: Record<string, *>, perDay: Record<string,*>,perActivity: Record<string, {}>, totals: {hours: number, comments: string[], activities: string[]}, result: *[]}>>}
  */
 export async function prepareReport(start, end) {
-    const url = source.host + '/report.php?group=day&quantisize=1&includeInfos=true&includeColors=false&topic=' + source.access + '&from=' + start.toMillis() + '&to=' + end.toMillis();
+    const url = source.host + '/report.php?group=day&quantisize=1&includeInfos=true&includeColors=false&topic=' + source.access + '&from=' + start.toUTC().toMillis() + '&to=' + end.toUTC().toMillis();
     console.log('Fetching data from ' + url);
 
     const res = await needle('get', url);

@@ -73,9 +73,9 @@ export async function inquireDate () {
     }
 
     start = DateTime.fromISO(start).setLocale('de');
-    start.set({hour: 0, minute: 0, second: 0, millisecond: 0});
+    start = start.set({hour: 0, minute: 0, second: 0, millisecond: 0});
     end = DateTime.fromISO(end).setLocale('de');
-    end.set({hour: 23, minute: 59, second: 59, millisecond: 999});
+    end = end.set({hour: 23, minute: 59, second: 59, millisecond: 999});
 
     if (end <= start) {
         console.error('End date must be after start date');

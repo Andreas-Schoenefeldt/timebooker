@@ -1,0 +1,24 @@
+info:
+  name: Profile
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{HOST}}/api/v1/profile"
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test('User Exists', () => {
+          expect(res.body.id).to.be.a('number');
+          bru.setVar('USER_ID', res.body.id);
+        })
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
