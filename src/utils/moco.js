@@ -59,4 +59,29 @@ export class MocoClient {
             "remote_url": "https://redmine.flowconcept.de/issues/" + entry.ticket,
         }, options);
     }
+
+    /**
+     *
+     * @param {DateTime} from
+     * @param {DateTime} to
+     * @returns {Promise<{hours: number, project: {id: number, name: string}}[]>}
+     */
+    async fetchReportedHours(from, to) {
+        const options = Object.assign({}, this.httpOptions);
+        const perPage = 500;
+
+        const url = new URL(`${this.apiBaseUrl}/activities`);
+        url.searchParams.append('from', from.toFormat('yyyy-MM-dd'));
+        url.searchParams.append('to', to.toFormat('yyyy-MM-dd'));
+        url.searchParams.append('per_page', perPage.toFixed(0));
+        const response = await needle('get', url.toString(), options);
+
+        const entries = response.body;
+
+        if (entries.length >= perPage) {
+            throw new Error(`More than ${perPage} entries found. Please implement a loop pull.`);
+        }
+
+        return entries;
+    }
 }

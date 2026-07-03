@@ -5,6 +5,7 @@ import {DateTime} from "luxon";
 import * as fs from "node:fs";
 import processReport from "./processReport.js";
 import {join} from "node:path";
+import {SupabaseClient} from "./utils/supabase.js";
 
 /**
  *
@@ -24,15 +25,21 @@ export async function prepareReport(start, end) {
     const entries = res.body.entries;
     const clean = [];
 
+    const activeActivities = [];
+    const supabase = new SupabaseClient(source.supabase);
 
-    entries.forEach((entry) => {
-
+    for (const entry of entries) {
         if (entry.time && entry.name && entry.name !== 'Pause') {
-            const minutes = Math.round(entry.time / 60000);
+            let minutes = Math.round(entry.time / 60000);
+
+            if (!activeActivities.includes(entry.name)) {
+                activeActivities.push(entry.name);
+                minutes += await supabase.mapCostToTimeForProject(entry.name, start, end);
+            }
+
 
             if (minutes > 1) {
                 const day = DateTime.fromMillis(entry.start);
-
                 clean.push({
                     date: day.toFormat('yyyy-MM-dd'),
                     activity: entry.name,
@@ -41,7 +48,7 @@ export async function prepareReport(start, end) {
                 })
             }
         }
-    });
+    }
 
     const dataDir = './data/';
     const reportsPath =  dataDir + 'report.json';

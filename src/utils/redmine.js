@@ -3,7 +3,7 @@ import needle from 'needle';
 export class RedmineClient {
     /**
      *
-     * @type {{id: number, email: string, full_name: string}}
+     * @type {{id: number, email?: string, full_name?: string}|null}
      */
     user;
     host;
@@ -12,7 +12,7 @@ export class RedmineClient {
 
     /**
      *
-     * @param {{host:string, apiKey: string}} options
+     * @param {{host:string, apiKey: string, userId?: number}} options
      */
     constructor(options) {
         this.host = options.host;
@@ -25,6 +25,8 @@ export class RedmineClient {
             rejectUnauthorized: false,
             json: true,
         };
+
+        this.user = options.userId ? {id: options.userId} : null;
     }
 
     /**
@@ -43,5 +45,33 @@ export class RedmineClient {
                 comments: entry.comment
             }
         }, options);
+    }
+
+    /**
+     *
+     * @param {DateTime} from
+     * @param {DateTime} to
+     * @returns {Promise<{hours: number, project: {id: number, name: string}}[]>}
+     */
+    async fetchReportedHours(from, to) {
+        const options = Object.assign({}, this.httpOptions);
+
+        const url = new URL(`${this.apiBaseUrl}/time_entries.json`);
+        url.searchParams.append('from', from.toFormat('yyyy-MM-dd'));
+        url.searchParams.append('to', to.toFormat('yyyy-MM-dd'));
+        if (this.user?.id) {
+            throw new Error('No User ID provided');
+        }
+        url.searchParams.append('user_id', this.user?.id);
+        url.searchParams.append('limit', 100); // this is the maximum limit, the api allows
+        const response = await needle('get', url.toString(), options);
+
+        const body = response.body;
+
+        if (body.total_count > body.limit) {
+            throw new Error('More than 100 entries found. Please implement a loop pull.');
+        }
+
+        return body.time_entries;
     }
 }
