@@ -37,9 +37,7 @@ export class SupabaseClient {
 
         if (cost > 0) {
             const exchangeRate = await getAverageUsdToEur(start, end);
-            const costEur = Math.round(cost * exchangeRate * 100) / 100;
-            console.log(`USD ${cost} AI cost for ${project}:  ${costEur} EUR`);
-            return costEur;
+            return Math.round(cost * exchangeRate * 100) / 100;
         }
 
         return 0;
@@ -47,13 +45,15 @@ export class SupabaseClient {
 
     async mapCostToTimeForProject(project, start, end) {
         const costEur = await this.getCostForRange(project, start, end);
+        let extraMinutes = 0;
 
-        const customer = activities[project]?.customer;
-        const costPerMinute = (byCustomer[customer].rate || 70) / 60;
+        if (costEur > 0) {
+            const customer = activities[project]?.customer;
+            const costPerMinute = (byCustomer[customer].rate || 70) / 60;
 
-        const extraMinutes = Math.ceil(costEur / costPerMinute);
-
-        console.log(`Cost for ${project}: ${costEur} EUR amounts to ${extraMinutes} extra minutes`);
+            extraMinutes = Math.ceil(costEur / costPerMinute);
+            console.log(`Cost for ${project}: ${costEur} EUR amounts to ${extraMinutes} extra minutes`);
+        }
 
         return extraMinutes;
     }
