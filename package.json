@@ -25,6 +25,7 @@
     "cheerio": "^1.0.0-rc.10",
     "fast-csv": "^4.3.6",
     "handlebars": "^4.7.8",
+    "iconv-lite": "^0.7.3",
     "inquirer": "^8.2.0",
     "just-handlebars-helpers": "^1.0.19",
     "luxon": "^2.5.2",

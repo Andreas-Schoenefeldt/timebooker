@@ -9,8 +9,8 @@ async function report(customer) {
         const file = `./data/${customer}_times.csv`;
 
         if (fs.existsSync(file)) {
-            await customerConf.report(`./data/${customer}_times.csv`);
-            console.log('All times for %o booked', customer);
+            const hours = await customerConf.report(`./data/${customer}_times.csv`);
+            console.log('%o hours for %o booked', typeof hours === 'number' ? hours.toFixed(2) : hours, customer);
         } else {
             console.log('No times available for %o', customer);
         }
