@@ -33,6 +33,16 @@ export default async function() {
 
     let answers = {};
     const applicableCustomers = Object.keys(byCustomer).filter(customer => entriesByCustomers[customer] && typeof byCustomer[customer].invoiceData === 'function');
+    const notApplicable = Object.keys(entriesByCustomers).filter(customer => !applicableCustomers.includes(customer));
+
+    if (notApplicable.length) {
+        console.log('');
+        console.log('The following customers with efforts in the period are not configured for invoicing:');
+        notApplicable.forEach(customer => console.log('  ' + customer + ' (' + entriesByCustomers[customer].totals.hours + ' hours)'));
+        console.log('');
+    }
+
+    let processedCustomers = [];
 
     while (answers.customersOrAll !== 'all' && answers.customersOrAll !== 'none') {
 
@@ -46,7 +56,7 @@ export default async function() {
                     {name: '- NONE -', value: 'none'},
                     {name: '- ALL -', value: 'all'}
                 ].concat(
-                    applicableCustomers.sort().map(customer => ({name: customer, value: customer}))
+                    applicableCustomers.sort().map(customer => ({name: customer + (processedCustomers.indexOf(customer) > -1 ? ' (done :-)' : ''), value: customer}))
                 )
             }
         ]);
@@ -73,6 +83,10 @@ export default async function() {
             });
 
             for (let invoiceData of invoiceDataArray) {
+                console.log('');
+                console.log('---------------------------------------------------------------------');
+                console.log('---------- Invoice for %o ' + '-'.repeat(43 - invoiceData.activity.length), invoiceData.activity);
+                console.log('---------------------------------------------------------------------');
 
                 let comparison = entriesByCustomers[customer].totals;
                 if (invoiceData.activity !== 'all') {
@@ -136,7 +150,12 @@ export default async function() {
                 await fs.promises.copyFile(pdfPath, copyTarget);
                 console.log(`✓ PDF copied to ${copyTarget}`);
                 console.log('');
+
+                if (typeof byCustomer[customer].afterInvoice === 'function') {
+                    await byCustomer[customer].afterInvoice(invoiceData);
+                }
             }
+            processedCustomers.push(customer);
         }
 
         // Close the browser after the PDFs are generated.
