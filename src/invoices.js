@@ -61,104 +61,107 @@ export default async function() {
             }
         ]);
 
-        let customers = answers.customersOrAll === 'all' ? applicableCustomers : [answers.customersOrAll];
+        if (answers.customersOrAll !== 'none') {
 
-        // Read and compile the Handlebars template from the 'templates' directory
-        const templatePath = join(import.meta.dirname, '../config/templates', 'invoice.hbs');
-        const templateSource = readFileSync(templatePath, 'utf8');
-        const template = Handlebars.compile(templateSource);
+            let customers = answers.customersOrAll === 'all' ? applicableCustomers : [answers.customersOrAll];
 
-        // Launch Puppeteer in headless mode
-        const browser = await puppeteer.launch();
+            // Read and compile the Handlebars template from the 'templates' directory
+            const templatePath = join(import.meta.dirname, '../config/templates', 'invoice.hbs');
+            const templateSource = readFileSync(templatePath, 'utf8');
+            const template = Handlebars.compile(templateSource);
 
-        for (let customer of customers) {
-            // thx to https://pdfbolt.com/blog/generate-pdf-nodejs-puppeteer
-            console.log('Generating invoice for %o', customer);
+            // Launch Puppeteer in headless mode
+            const browser = await puppeteer.launch();
 
-            // get the data from our protected function
-            /** @type {InvoiceData[]} */
-            const invoiceDataArray = await byCustomer[customer].invoiceData(start, end, {
-                dataDir: join(import.meta.dirname, '../data'),
-                entries: entriesByCustomers[customer],
-            });
+            for (let customer of customers) {
+                // thx to https://pdfbolt.com/blog/generate-pdf-nodejs-puppeteer
+                console.log('Generating invoice for %o', customer);
 
-            for (let invoiceData of invoiceDataArray) {
-                console.log('');
-                console.log('---------------------------------------------------------------------');
-                console.log('---------- Invoice for %o ' + '-'.repeat(43 - invoiceData.activity.length), invoiceData.activity);
-                console.log('---------------------------------------------------------------------');
-
-                let comparison = entriesByCustomers[customer].totals;
-                if (invoiceData.activity !== 'all') {
-                    comparison = entriesByCustomers[customer].perActivity[invoiceData.activity];
-                }
-
-                console.table(invoiceData.lines);
-                console.table([
-                    ['invoice number:', invoiceData.invoiceNumber],
-                    ['hours invoiced:', invoiceData.hoursTotal.toFixed(2)],
-                    ['hours tracked:', comparison.hours.toFixed(2)],
-                    ['Netto:', invoiceData.netTotal.toFixed(2)],
-                    ['Ust.:', invoiceData.tax.toFixed(2)],
-                    ['Gesamt.:', invoiceData.total.toFixed(2)],
-                ]);
-
-                console.log('');
-
-                if (comparison.hours > invoiceData.hoursTotal) {
-                    console.error(`🚨  only invoicing ${invoiceData.hoursTotal}/${comparison.hours} hours for ${invoiceData.activity} (${(invoiceData.hoursTotal / comparison.hours * 100).toFixed(1)}%)`);
-                }
-
-                console.log('');
-
-                const html = template(invoiceData);
-                // writeFileSync(join(import.meta.dirname, '../data', invoiceData.invoiceNumber + '.html'), html);
-
-                // Set the generated HTML as the page content and wait for it to load completely
-                const page = await browser.newPage();
-                await page.setContent(html, { waitUntil: 'networkidle0' });
-
-                // Create a PDF from the HTML content and save it with a timestamped filename
-                const pdfName = (invoiceData.invoiceFileName || invoiceData.invoiceNumber) + '.pdf';
-                const pdfPath =  join(import.meta.dirname, '../data', pdfName);
-                await page.pdf({
-                    path: pdfPath,
-                    format: 'A4',
-                    printBackground: true // Ensures background colors and images are included
-                    // Additional parameters can be added here if needed
+                // get the data from our protected function
+                /** @type {InvoiceData[]} */
+                const invoiceDataArray = await byCustomer[customer].invoiceData(start, end, {
+                    dataDir: join(import.meta.dirname, '../data'),
+                    entries: entriesByCustomers[customer],
                 });
 
-                if (invoiceData.attachments) {
-                    const merger = new PDFMerger();
+                for (let invoiceData of invoiceDataArray) {
+                    console.log('');
+                    console.log('---------------------------------------------------------------------');
+                    console.log('---------- Invoice for %o ' + '-'.repeat(43 - invoiceData.activity.length), invoiceData.activity);
+                    console.log('---------------------------------------------------------------------');
 
-                    await merger.add(pdfPath);
-                    for (let attachmentPath of invoiceData.attachments) {
-                        await merger.add(attachmentPath);
+                    let comparison = entriesByCustomers[customer].totals;
+                    if (invoiceData.activity !== 'all') {
+                        comparison = entriesByCustomers[customer].perActivity[invoiceData.activity];
                     }
 
-                    await merger.setMetadata({
-                        author: invoiceData.myself.name,
-                        creator: invoiceData.myself.name,
-                        title: `Rechnung ${invoiceData.invoiceNumber}`
+                    console.table(invoiceData.lines);
+                    console.table([
+                        ['invoice number:', invoiceData.invoiceNumber],
+                        ['hours invoiced:', invoiceData.hoursTotal.toFixed(2)],
+                        ['hours tracked:', comparison.hours.toFixed(2)],
+                        ['Netto:', invoiceData.netTotal.toFixed(2)],
+                        ['Ust.:', invoiceData.tax.toFixed(2)],
+                        ['Gesamt.:', invoiceData.total.toFixed(2)],
+                    ]);
+
+                    console.log('');
+
+                    if (comparison.hours > invoiceData.hoursTotal) {
+                        console.error(`🚨  only invoicing ${invoiceData.hoursTotal}/${comparison.hours} hours for ${invoiceData.activity} (${(invoiceData.hoursTotal / comparison.hours * 100).toFixed(1)}%)`);
+                    }
+
+                    console.log('');
+
+                    const html = template(invoiceData);
+                    // writeFileSync(join(import.meta.dirname, '../data', invoiceData.invoiceNumber + '.html'), html);
+
+                    // Set the generated HTML as the page content and wait for it to load completely
+                    const page = await browser.newPage();
+                    await page.setContent(html, { waitUntil: 'networkidle0' });
+
+                    // Create a PDF from the HTML content and save it with a timestamped filename
+                    const pdfName = (invoiceData.invoiceFileName || invoiceData.invoiceNumber) + '.pdf';
+                    const pdfPath =  join(import.meta.dirname, '../data', pdfName);
+                    await page.pdf({
+                        path: pdfPath,
+                        format: 'A4',
+                        printBackground: true // Ensures background colors and images are included
+                        // Additional parameters can be added here if needed
                     });
 
-                    await merger.save(pdfPath);
-                }
+                    if (invoiceData.attachments) {
+                        const merger = new PDFMerger();
 
-                console.log(`✓ PDF successfully created at: ${pdfPath}`);
-                const copyTarget = byCustomer.config.invoiceLocation + '/' + (byCustomer[customer].folderName || customer) + '/' + pdfName;
-                await fs.promises.copyFile(pdfPath, copyTarget);
-                console.log(`✓ PDF copied to ${copyTarget}`);
-                console.log('');
+                        await merger.add(pdfPath);
+                        for (let attachmentPath of invoiceData.attachments) {
+                            await merger.add(attachmentPath);
+                        }
 
-                if (typeof byCustomer[customer].afterInvoice === 'function') {
-                    await byCustomer[customer].afterInvoice(invoiceData);
+                        await merger.setMetadata({
+                            author: invoiceData.myself.name,
+                            creator: invoiceData.myself.name,
+                            title: `Rechnung ${invoiceData.invoiceNumber}`
+                        });
+
+                        await merger.save(pdfPath);
+                    }
+
+                    console.log(`✓ PDF successfully created at: ${pdfPath}`);
+                    const copyTarget = byCustomer.config.invoiceLocation + '/' + (byCustomer[customer].folderName || customer) + '/' + pdfName;
+                    await fs.promises.copyFile(pdfPath, copyTarget);
+                    console.log(`✓ PDF copied to ${copyTarget}`);
+                    console.log('');
+
+                    if (typeof byCustomer[customer].afterInvoice === 'function') {
+                        await byCustomer[customer].afterInvoice(invoiceData);
+                    }
                 }
+                processedCustomers.push(customer);
             }
-            processedCustomers.push(customer);
-        }
 
-        // Close the browser after the PDFs are generated.
-        await browser.close();
+            // Close the browser after the PDFs are generated.
+            await browser.close();
+        }
     }
 }

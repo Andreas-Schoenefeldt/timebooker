@@ -210,7 +210,7 @@ const processLine = async function (entry) {
                 }
             }
 
-            const weekConf = entriesByCustomers[customer].perWeek[weekKey];
+            const weekConf = entriesByCustomers[customer].perWeek[weekKey] || {tickets: [], comments: []};
 
             ticketNumbers.forEach((ticket) => {
                 if (weekConf.tickets.indexOf(ticket) < 0) {
@@ -291,8 +291,8 @@ export default async function (reportsPath) {
 
                 // adjust the per week string
                 Object.keys(entriesByCustomers[customer].perWeek).forEach((key) => {
-                    entriesByCustomers[customer].perWeek[key].tickets = (entriesByCustomers[customer].perWeek[key].tickets || []).join(', ');
-                    entriesByCustomers[customer].perWeek[key].comments = (entriesByCustomers[customer].perWeek[key].comments || []).join(', ');
+                    entriesByCustomers[customer].perWeek[key].tickets = (entriesByCustomers[customer].perWeek[key]?.tickets ? entriesByCustomers[customer].perWeek[key]?.tickets : []).join(', ');
+                    entriesByCustomers[customer].perWeek[key].comments = (entriesByCustomers[customer].perWeek[key]?.comments ? entriesByCustomers[customer].perWeek[key]?.comments : []).join(', ');
                 });
 
                 csv.writeToPath('./data/' + customer + '_times.csv', entriesByCustomers[customer].result, {headers: true});
