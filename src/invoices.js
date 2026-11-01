@@ -56,7 +56,7 @@ export default async function() {
                     {name: '- NONE -', value: 'none'},
                     {name: '- ALL -', value: 'all'}
                 ].concat(
-                    applicableCustomers.sort().map(customer => ({name: customer + (processedCustomers.indexOf(customer) > -1 ? ' (done :-)' : ''), value: customer}))
+                    applicableCustomers.sort().map(customer => ({name: `${customer}, ${entriesByCustomers[customer].totals.hours} hours${(processedCustomers.indexOf(customer) > -1 ? ' (done :-)' : '')}`, value: customer}))
                 )
             }
         ]);
